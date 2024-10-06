@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>TinyURL</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+<div class="container">
+    <h1 class="mt-5">TinyURL Shortener</h1>
+    <form id="urlForm" class="mt-4">
+        <div class="form-group">
+            <label for="originalUrl">Enter Original URL:</label>
+            <input type="text" id="originalUrl" name="originalUrl" class="form-control" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Shorten</button>
+    </form>
+
+    <div id="shortUrlContainer" class="mt-4" style="display: none;">
+        <h3>Shortened URL:</h3>
+        <p><a id="shortUrlLink" href="#" target="_blank"></a></p>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function() {
+        $('#urlForm').on('submit', function(e) {
+            e.preventDefault();
+            const originalUrl = $('#originalUrl').val();
+            $.post('/shorten', { originalUrl: originalUrl }, function(shortUrl) {
+                $('#shortUrlLink').attr('href', shortUrl).text(shortUrl);
+                $('#shortUrlContainer').show();
+            });
+        });
+    });
+</script>
+</body>
+</html>
