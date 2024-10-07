@@ -6,33 +6,54 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
-<div class="container">
-    <h1 class="mt-5">TinyURL Shortener</h1>
-    <form id="urlForm" class="mt-4">
-        <div class="form-group">
-            <label for="originalUrl">Enter Original URL:</label>
-            <input type="text" id="originalUrl" name="originalUrl" class="form-control" required>
+    <div class="container">
+        <h1 class="mt-5">TinyURL Shortener</h1>
+        <form id="urlForm" class="mt-4">
+            <div class="form-group">
+                <label for="originalUrl">Enter Original URL:</label>
+                <input type="text" id="originalUrl" name="originalUrl" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="customUrl">Custom Short URL (optional):</label>
+                <input type="text" id="customUrl" name="customUrl" class="form-control">
+            </div>
+            <div class="form-group">
+                <label for="expirationTime">Expiration Time (in minutes, optional):</label>
+                <input type="number" id="expirationTime" name="expirationTime" class="form-control">
+            </div>
+            <button type="submit" class="btn btn-primary">Shorten</button>
+        </form>
+    
+        <div id="shortUrlContainer" class="mt-4" style="display: none;">
+            <h3>Shortened URL:</h3>
+            <p><a id="shortUrlLink" href="#" target="_blank"></a></p>
         </div>
-        <button type="submit" class="btn btn-primary">Shorten</button>
-    </form>
-
-    <div id="shortUrlContainer" class="mt-4" style="display: none;">
-        <h3>Shortened URL:</h3>
-        <p><a id="shortUrlLink" href="#" target="_blank"></a></p>
     </div>
-</div>
 
 <script>
+    
     $(document).ready(function() {
         $('#urlForm').on('submit', function(e) {
             e.preventDefault();
             const originalUrl = $('#originalUrl').val();
-            $.post('/shorten', { originalUrl: originalUrl }, function(shortUrl) {
+            const customUrl = $('#customUrl').val();
+            let expirationMinutes = $('#expirationTime').val();
+
+            // Check for negative or zero expiration time
+            if (expirationMinutes && expirationMinutes <= 0) {
+                alert("Expiration time must be a positive number.");
+                return;
+            }
+
+            $.post('/shorten', { originalUrl: originalUrl, customUrl: customUrl, expirationMinutes: expirationMinutes }, function(shortUrl) {
                 $('#shortUrlLink').attr('href', shortUrl).text(shortUrl);
                 $('#shortUrlContainer').show();
+            }).fail(function(xhr) {
+                alert(xhr.responseText); // Show error message
             });
         });
     });
+
 </script>
 </body>
 </html>

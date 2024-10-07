@@ -26,10 +26,26 @@ public class UrlController {
     }
 
     @PostMapping("/shorten")
-    public ResponseEntity<String> shortenUrl(@RequestParam String originalUrl) {
-        String shortUrl = service.shortenUrl(originalUrl);
-        return ResponseEntity.ok(shortUrl); // Return the shortened URL as a response
+    public ResponseEntity<String> shortenUrl(
+        @RequestParam String originalUrl, 
+        @RequestParam(required = false) String customUrl,
+        @RequestParam(required = false) Long expirationMinutes) {
+
+        try {
+            String shortUrl;
+            if (customUrl != null && !customUrl.isEmpty()) {
+                shortUrl = service.shortenUrlWithCustom(originalUrl, customUrl, expirationMinutes);
+            } else {
+                shortUrl = service.shortenUrl(originalUrl, expirationMinutes);
+            }
+            return ResponseEntity.ok(shortUrl);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage()); // Send error message to the frontend
+        }
     }
+
+
+
 
     @GetMapping("/{shortUrl}")
     public RedirectView redirectToOriginal(@PathVariable String shortUrl) {
